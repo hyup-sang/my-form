@@ -4,12 +4,9 @@
 개인 공부용으로 **Frontend는 간단한 화면만 제공하며, Backend 위주**로 작업합니다.
 
 ## 기술 스택
-- Backend
-  - Java 17
-  - Spring Boot
-  - Spring JPA
-- Frontend
-  - Javascript
-  - React
+- Java 17
+- Spring Boot
+- Spring JPA
+- React
  
 진행 하면서 추가 예정..
