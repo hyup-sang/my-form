@@ -3,16 +3,8 @@ package com.forms.api.member.service;
 import com.forms.api.member.domain.Member;
 import com.forms.api.member.domain.repository.MemberRepository;
 import com.forms.api.member.dto.request.CreateMemberRequest;
-import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
-import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.jdbc.JdbcDaoImpl;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.provisioning.JdbcUserDetailsManager;
 import org.springframework.stereotype.Service;
-
-import javax.sql.DataSource;
 
 @Service
 public class MemberService {
@@ -23,12 +15,25 @@ public class MemberService {
     }
 
     public void createMember(CreateMemberRequest createMemberRequest) {
+        // Todo: 추후 에러 처리 수정
+        if (memberRepository.existsByEmail(createMemberRequest.getEmail())) {
+            throw new RuntimeException("중복된 이메일 입니다.");
+        }
+
+        if (memberRepository.existsByNickname(createMemberRequest.getNickname())) {
+            throw new RuntimeException("중복된 닉네임 입니다.");
+        }
+
         Member member = new Member(
             createMemberRequest.getEmail(),
-            createMemberRequest.getPassword(),
+            passwordEncoder().encode(createMemberRequest.getPassword()),
             createMemberRequest.getNickname()
         );
 
         this.memberRepository.save(member);
+    }
+
+    private BCryptPasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 }
