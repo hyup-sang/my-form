@@ -3,6 +3,7 @@ package com.forms.api.member.service;
 import com.forms.api.member.domain.Member;
 import com.forms.api.member.domain.repository.MemberRepository;
 import com.forms.api.member.dto.request.CreateMemberRequest;
+import com.forms.api.member.dto.request.ModifyMemberRequest;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -31,6 +32,24 @@ public class MemberService {
         );
 
         this.memberRepository.save(member);
+    }
+
+    public Member getMember(Long memberId) {
+        return memberRepository.findById(memberId).orElse(null);
+    }
+
+    public void modifyMember(Long memberId, ModifyMemberRequest modifyMemberRequest) {
+        Member member = this.getMember(memberId);
+        member.modifyMember(
+            modifyMemberRequest.getPassword(),
+            modifyMemberRequest.getNickname()
+        );
+
+        memberRepository.save(member);
+    }
+
+    public void deleteMember(Long memberId) {
+        memberRepository.deleteById(memberId);
     }
 
     private BCryptPasswordEncoder passwordEncoder() {

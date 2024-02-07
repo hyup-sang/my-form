@@ -10,6 +10,8 @@ import jakarta.persistence.EnumType;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.AccessLevel;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import java.time.LocalDateTime;
@@ -17,6 +19,8 @@ import java.time.LocalDateTime;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@SQLDelete(sql = "UPDATE member SET status = 'DELETED' WHERE member_id = ?")
+@Where(clause = "status = 'ACTIVE'")
 public class Member {
     @Id @Column(name = "member_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -48,6 +52,12 @@ public class Member {
         this.nickname = nickname;
         this.status = MemberStatus.ACTIVE;
         this.createdAt = LocalDateTime.now();
+        this.modifiedAt = LocalDateTime.now();
+    }
+
+    public void modifyMember(String password, String nickname) {
+        this.password = password;
+        this.nickname = nickname;
         this.modifiedAt = LocalDateTime.now();
     }
 }
