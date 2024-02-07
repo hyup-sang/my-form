@@ -40,6 +40,11 @@ public class MemberService {
 
     public void modifyMember(Long memberId, ModifyMemberRequest modifyMemberRequest) {
         Member member = this.getMember(memberId);
+
+        if (member == null) {
+            return;
+        }
+
         member.modifyMember(
             modifyMemberRequest.getPassword(),
             modifyMemberRequest.getNickname()
