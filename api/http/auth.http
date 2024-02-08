@@ -1,0 +1,8 @@
+### Sign in
+POST {{host}}/sign-in
+Content-Type: application/json
+
+{
+  "email": "test1@testom",
+  "password": "qlalfqjsgh1!"
+}

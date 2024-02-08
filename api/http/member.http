@@ -1,0 +1,28 @@
+### 사용자 생성
+POST {{host}}/member
+Content-Type: application/json
+
+{
+  "email": "test1@testom",
+  "password": "qlalfqjsgh1!",
+  "nickname": "닉네임1"
+}
+
+### 사용자 조회
+GET {{host}}/member/1
+Content-Type: application/json
+Authorization: {{token}}
+
+### 사용자 수정
+PATCH {{host}}/member/1
+Content-Type: application/json
+
+{
+  "password": "qlalfqjsgh2@",
+  "nickname": "닉네임2"
+}
+
+### 사용자 삭제
+DELETE {{host}}/member/1
+Content-Type: application/json
+

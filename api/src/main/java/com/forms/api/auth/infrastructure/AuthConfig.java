@@ -1,4 +1,4 @@
-package com.forms.api.auth;
+package com.forms.api.auth.infrastructure;
 
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.jwk.JWKSet;
@@ -9,10 +9,15 @@ import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.ProviderManager;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
@@ -34,8 +39,10 @@ public class AuthConfig {
         return http.authorizeHttpRequests(
                 auth -> {
                     // login 요청 허용
-                    auth.requestMatchers("/authenticate").permitAll()
+//                    auth.requestMatchers("/authenticate").permitAll()
+                    auth.requestMatchers(HttpMethod.POST, "/sign-in").permitAll()
                         .requestMatchers(HttpMethod.POST,"/member").permitAll()
+                        .requestMatchers("/error").permitAll()
                         // preflight 요청 허용 cors 관련
                         .requestMatchers(HttpMethod.OPTIONS,"/**").permitAll()
                         // h2 console 허용
@@ -57,6 +64,21 @@ public class AuthConfig {
     }
 
     @Bean
+    public AuthenticationManager authenticationManager(
+        CustomUserDetailsService customUserDetailsService
+    ) {
+        var authenticationProvider = new DaoAuthenticationProvider();
+        authenticationProvider.setUserDetailsService(customUserDetailsService);
+        authenticationProvider.setPasswordEncoder(passwordEncoder());
+        return new ProviderManager(authenticationProvider);
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
+    @Bean
     public KeyPair keyPair() {
         try {
             var keyPairGenerator = KeyPairGenerator.getInstance("RSA");
@@ -70,10 +92,10 @@ public class AuthConfig {
     @Bean
     public RSAKey rsaKey(KeyPair keyPair) {
         return new RSAKey
-                .Builder((RSAPublicKey)keyPair.getPublic())
-                .privateKey(keyPair.getPrivate())
-                .keyID(UUID.randomUUID().toString())
-                .build();
+            .Builder((RSAPublicKey)keyPair.getPublic())
+            .privateKey(keyPair.getPrivate())
+            .keyID(UUID.randomUUID().toString())
+            .build();
     }
 
     @Bean
@@ -85,8 +107,8 @@ public class AuthConfig {
     @Bean
     public JwtDecoder jwtDecoder(RSAKey rsaKey) throws JOSEException {
         return NimbusJwtDecoder
-                .withPublicKey(rsaKey.toRSAPublicKey())
-                .build();
+            .withPublicKey(rsaKey.toRSAPublicKey())
+            .build();
     }
 
     @Bean
