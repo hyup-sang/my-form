@@ -1,5 +1,6 @@
-package com.forms.api.auth.infrastructure;
+package com.forms.api.auth.service;
 
+import com.forms.api.auth.infrastructure.UserPrincipal;
 import com.forms.api.member.domain.Member;
 import com.forms.api.member.domain.repository.MemberRepository;
 import org.springframework.security.core.userdetails.UserDetails;

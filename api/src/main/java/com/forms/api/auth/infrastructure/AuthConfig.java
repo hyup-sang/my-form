@@ -1,5 +1,6 @@
 package com.forms.api.auth.infrastructure;
 
+import com.forms.api.auth.service.CustomUserDetailsService;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
