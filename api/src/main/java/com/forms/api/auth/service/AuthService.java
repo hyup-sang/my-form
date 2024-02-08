@@ -3,36 +3,86 @@ package com.forms.api.auth.service;
 import com.forms.api.auth.dto.request.SignInRequest;
 import com.forms.api.member.domain.Member;
 import com.forms.api.member.domain.repository.MemberRepository;
+import org.apache.coyote.BadRequestException;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.ProviderManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.jwt.JwtClaimsSet;
+import org.springframework.security.oauth2.jwt.JwtEncoder;
+import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.stereotype.Service;
 
-import static com.forms.api.auth.infrastructure.AuthUtil.passwordEncoder;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.stream.Collectors;
+
 
 @Service
 public class AuthService {
-    MemberRepository memberRepository;
+    private final MemberRepository memberRepository;
+    private final JwtEncoder jwtEncoder;
+    private final PasswordEncoder passwordEncoder;
+    private final AuthenticationManager authenticationManager;
 
-    public AuthService(MemberRepository memberRepository) {
+    public AuthService(
+        MemberRepository memberRepository,
+        JwtEncoder jwtEncoder,
+        PasswordEncoder passwordEncoder,
+        AuthenticationManager authenticationManager
+    ) {
         this.memberRepository = memberRepository;
+        this.jwtEncoder = jwtEncoder;
+        this.passwordEncoder = passwordEncoder;
+        this.authenticationManager = authenticationManager;
     }
 
-    public void signIn(SignInRequest signInRequest) {
-        Member member = memberRepository.findByEmail(signInRequest.getEmail());
-
-        if (member == null) {
-            System.out.println("not exists");
-            return;
-        }
+    public String signIn(SignInRequest signInRequest) throws BadRequestException {
+        Member member = memberRepository
+            .findByEmail(signInRequest.getEmail())
+            .orElseThrow(() -> new BadRequestException("not exists"));
 
         if (!isMatchedPassword(signInRequest.getPassword(), member.getPassword())) {
-            System.out.println("not matched password");
-            return;
+            throw new BadRequestException("not matched password");
         }
 
-        System.out.println("success");
-        return;
+        UsernamePasswordAuthenticationToken authenticationToken =
+            new UsernamePasswordAuthenticationToken(
+                signInRequest.getEmail(),
+                signInRequest.getPassword()
+            );
+
+        Authentication authentication =
+            authenticationManager.authenticate(authenticationToken);
+
+        return generateToken(authentication);
     }
 
     private boolean isMatchedPassword(String rawPassword, String encodedPassword) {
-        return passwordEncoder().matches(rawPassword, encodedPassword);
+        return passwordEncoder.matches(rawPassword, encodedPassword);
+    }
+
+    private String generateToken(Authentication authentication) {
+        var scope = authentication
+            .getAuthorities()
+            .stream()
+            .map(GrantedAuthority::getAuthority)
+            .collect(Collectors.joining(" "));
+
+        var claims = JwtClaimsSet.builder()
+            .issuer("self")
+            .issuedAt(Instant.now())
+            .expiresAt(Instant.now().plus(90, ChronoUnit.MINUTES))
+            .subject(authentication.getName())
+            .claim("scope", scope)
+            .build();
+
+        return this.jwtEncoder
+            .encode(JwtEncoderParameters.from(claims))
+            .getTokenValue();
     }
 }

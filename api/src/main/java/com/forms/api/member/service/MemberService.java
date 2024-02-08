@@ -4,16 +4,20 @@ import com.forms.api.member.domain.Member;
 import com.forms.api.member.domain.repository.MemberRepository;
 import com.forms.api.member.dto.request.CreateMemberRequest;
 import com.forms.api.member.dto.request.ModifyMemberRequest;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import static com.forms.api.auth.infrastructure.AuthUtil.passwordEncoder;
 
 @Service
 public class MemberService {
     private final MemberRepository memberRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public MemberService(MemberRepository memberRepository) {
+    public MemberService(
+        MemberRepository memberRepository,
+        PasswordEncoder passwordEncoder
+    ) {
         this.memberRepository = memberRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public void createMember(CreateMemberRequest createMemberRequest) {
@@ -28,7 +32,7 @@ public class MemberService {
 
         Member member = new Member(
             createMemberRequest.getEmail(),
-            passwordEncoder().encode(createMemberRequest.getPassword()),
+            passwordEncoder.encode(createMemberRequest.getPassword()),
             createMemberRequest.getNickname()
         );
 
