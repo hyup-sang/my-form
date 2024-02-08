@@ -4,8 +4,9 @@ import com.forms.api.member.domain.Member;
 import com.forms.api.member.domain.repository.MemberRepository;
 import com.forms.api.member.dto.request.CreateMemberRequest;
 import com.forms.api.member.dto.request.ModifyMemberRequest;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import static com.forms.api.auth.infrastructure.AuthUtil.passwordEncoder;
 
 @Service
 public class MemberService {
@@ -55,9 +56,5 @@ public class MemberService {
 
     public void deleteMember(Long memberId) {
         memberRepository.deleteById(memberId);
-    }
-
-    private BCryptPasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
     }
 }
