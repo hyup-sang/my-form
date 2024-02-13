@@ -1,5 +1,6 @@
 package com.forms.api.auth.infrastructure;
 
+import com.forms.api.auth.service.UserService;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
@@ -33,6 +34,13 @@ import static org.springframework.security.config.Customizer.withDefaults;
 
 @Configuration
 public class AuthConfig {
+    private UserService userService;
+
+    public AuthConfig(
+        UserService userService
+    ) {
+        this.userService = userService;
+    }
 
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -63,12 +71,11 @@ public class AuthConfig {
             .build();
     }
 
+
     @Bean
-    public AuthenticationManager authenticationManager(
-        CustomUserDetailsService customUserDetailsService
-    ) {
+    public AuthenticationManager authenticationManager() {
         var authenticationProvider = new DaoAuthenticationProvider();
-        authenticationProvider.setUserDetailsService(customUserDetailsService);
+        authenticationProvider.setUserDetailsService(userService.userDetailsService());
         authenticationProvider.setPasswordEncoder(passwordEncoder());
         return new ProviderManager(authenticationProvider);
     }

@@ -10,15 +10,15 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class CreateMemberRequest {
-    @NotBlank(message = "이메일은 필수 입력 값입니다.")
-    @Email(message = "이메일 형식에 맞지 않습니다.")
+    @NotBlank
+    @Email
     private String email;
 
-    @NotBlank(message = "비밀번호는 필수 입력 값입니다.")
+    @NotBlank
     @Pattern(regexp="(?=.*[0-9])(?=.*[a-zA-Z])(?=.*\\W)(?=\\S+$).{8,20}",
-        message = "비밀번호는 영문, 숫자, 특수기호가 적어도 1개 이상 포함되어야 합니다.")
+        message = "비밀번호는 영문, 숫자, 특수기호가 1개 이상 포함되어야 합니다.")
     private String password;
 
-    @NotBlank(message = "닉네임은 필수 입력 값입니다.")
+    @NotBlank
     private String nickname;
 }
