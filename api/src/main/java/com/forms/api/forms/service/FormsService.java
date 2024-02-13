@@ -17,9 +17,9 @@ public class FormsService {
         this.formsRepository = formsRepository;
     }
 
-    public void createForms(CreateFormsRequest createFormsRequest) {
+    public void createForms(Member member, CreateFormsRequest createFormsRequest) {
         Forms forms = Forms.builder()
-//                        .member(member)
+                        .member(member)
                         .title(createFormsRequest.getTitle())
                         .description(createFormsRequest.getDescription())
                         .access(createFormsRequest.getAccess())
