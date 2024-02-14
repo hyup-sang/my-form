@@ -1,0 +1,41 @@
+### Create Forms
+POST {{host}}/forms
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+  "title": "제목",
+  "description": "",
+  "access": "PUBLIC",
+  "startedAt": "2023-02-15T00:00:00",
+  "endedAt": "2099-12-31T00:00:00"
+}
+
+### Find Forms
+GET {{host}}/forms/1
+Content-Type: application/json
+Authorization: {{token}}
+
+### Find Forms List
+GET {{host}}/forms
+Content-Type: application/json
+Authorization: {{token}}
+
+### Modify Forms
+PATCH {{host}}/forms/1
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+  "title": "제목2",
+  "description": "d",
+  "access": "PRIVATE",
+  "startedAt": "2023-03-01T00:00:00",
+  "endedAt": "2099-11-30T00:00:00"
+}
+
+### Delete Forms
+DELETE {{host}}/forms/1
+Content-Type: application/json
+Authorization: {{token}}
+
