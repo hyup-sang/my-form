@@ -1,9 +1,8 @@
 package com.forms.api.forms.dto.request;
 
 import com.forms.api.forms.domain.FormsAccess;
+import com.forms.api.forms.domain.FormsStatus;
 import jakarta.annotation.Nullable;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,20 +12,23 @@ import java.time.LocalDateTime;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class CreateFormsRequest {
-    @NotBlank
+public class ModifyFormsRequest {
+    @Nullable
     private String title;
 
     @Nullable
     private String description;
 
-    @NotNull
+    @Nullable
     private FormsAccess access;
 
-    @NotNull
+    @Nullable
+    private FormsStatus status;
+
+    @Nullable
     private LocalDateTime startedAt;
 
-    @NotNull
+    @Nullable
     private LocalDateTime endedAt;
 
 }
