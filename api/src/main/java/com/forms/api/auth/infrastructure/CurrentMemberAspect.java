@@ -11,6 +11,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
+import java.util.Arrays;
+
 @Configuration
 @Aspect
 public class CurrentMemberAspect {
@@ -27,7 +29,7 @@ public class CurrentMemberAspect {
         Member member = memberRepository.findByEmail(email).orElseThrow(() ->
             new UsernameNotFoundException("사용자를 찾을 수 없습니다. email: " + email)
         );
-        Object[] args = { member, joinPoint.getArgs()[1] };
+        Object[] args = Arrays.stream(joinPoint.getArgs()).map(data -> { if(data instanceof Member) { data = member; } return data; }).toArray();
         return joinPoint.proceed(args);
     }
 }
