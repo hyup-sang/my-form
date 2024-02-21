@@ -1,6 +1,7 @@
 package com.forms.api.auth.presentation;
 
 import com.forms.api.auth.dto.request.SignInRequest;
+import com.forms.api.auth.dto.response.SignInResponse;
 import com.forms.api.auth.service.AuthService;
 import jakarta.validation.Valid;
 import org.apache.coyote.BadRequestException;
@@ -18,9 +19,9 @@ public class AuthController {
     }
 
     @PostMapping("/sign-in")
-    public ResponseEntity<String> signIn(@Valid @RequestBody SignInRequest signInRequest) throws BadRequestException {
-        String token = authService.signIn(signInRequest);
-        return ResponseEntity.ok(token);
+    public ResponseEntity<SignInResponse> signIn(@Valid @RequestBody SignInRequest signInRequest) throws BadRequestException {
+        SignInResponse response = authService.signIn(signInRequest);
+        return ResponseEntity.ok(response);
     }
 
 
