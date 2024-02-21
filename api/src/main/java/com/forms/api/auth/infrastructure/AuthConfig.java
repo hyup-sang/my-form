@@ -14,6 +14,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -24,15 +25,20 @@ import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.interfaces.RSAPublicKey;
+import java.util.Arrays;
 import java.util.UUID;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 
 @Configuration
+@EnableWebSecurity
 public class AuthConfig {
     private UserService userService;
 
@@ -65,12 +71,25 @@ public class AuthConfig {
             .httpBasic(withDefaults())
             // Stateless에선 csrf가 필요 하지 않아 비활성화
             .csrf(AbstractHttpConfigurer::disable)
+            .cors((cors) -> cors
+                .configurationSource(corsConfigurationSource())
+            )
             // h2 console 접속을 위한 옵션
             .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin))
             .oauth2ResourceServer(oauth2 -> oauth2.jwt(withDefaults()))
             .build();
     }
 
+    @Bean
+    CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000"));
+        configuration.setAllowedHeaders(Arrays.asList("Origin", "Content-Type", "Accept", "responseType", "Authorization"));
+        configuration.setAllowedMethods(Arrays.asList("GET","POST", "OPTIONS"));
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
+    }
 
     @Bean
     public AuthenticationManager authenticationManager() {

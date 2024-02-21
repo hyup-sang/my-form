@@ -1,6 +1,7 @@
 package com.forms.api.auth.service;
 
 import com.forms.api.auth.dto.request.SignInRequest;
+import com.forms.api.auth.dto.response.SignInResponse;
 import com.forms.api.member.domain.Member;
 import com.forms.api.member.domain.repository.MemberRepository;
 import org.apache.coyote.BadRequestException;
@@ -38,7 +39,7 @@ public class AuthService {
         this.authenticationManager = authenticationManager;
     }
 
-    public String signIn(SignInRequest signInRequest) throws BadRequestException {
+    public SignInResponse signIn(SignInRequest signInRequest) throws BadRequestException {
         Member member = memberRepository
             .findByEmail(signInRequest.getEmail())
             .orElseThrow(() -> new BadRequestException("not exists"));
@@ -56,7 +57,12 @@ public class AuthService {
         Authentication authentication =
             authenticationManager.authenticate(authenticationToken);
 
-        return generateToken(authentication);
+        return new SignInResponse(
+            member.getId()
+            , member.getNickname()
+            , member.getEmail()
+            , generateToken(authentication)
+        );
     }
 
     private boolean isMatchedPassword(String rawPassword, String encodedPassword) {
